@@ -1,24 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-
-const USERS = [
-  {
-    email: 'alex@vansales.com',
-    password: 'password123',
-    role: 'van-rep',
-  },
-  {
-    email: 'rayyidh@bestjuice.com',
-    password: 'password123',
-    role: 'distributor',
-  },
-  {
-    email: 'manager@manufacturer.com',
-    password: 'password123',
-    role: 'manager',
-  },
-];
+import api from '../api/api.jsx'; 
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -28,22 +11,28 @@ export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const user = USERS.find(
-      (u) => u.email === email.trim() && u.password === password
-    );
-    setTimeout(() => {
+    try {
+      const response = await api.post('/login', { email, password });
+      // Assuming backend returns { user: { ... }, token: '...' }
+      const { user, token } = response.data;
+      login({ ...user, token }); // Save user and token in context
+      // Redirect based on user role
+      if (user.role === 'van-rep') navigate('/van-rep');
+      else if (user.role === 'distributor') navigate('/distributor');
+      else if (user.role === 'manager') navigate('/manager');
+      else navigate('/');
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        'Login failed. Please check your credentials and try again.'
+      );
+    } finally {
       setLoading(false);
-      if (user) {
-        login(user); // set user in context
-        navigate(`/${user.role}`);
-      } else {
-        setError('Invalid credentials. Please try again.');
-      }
-    }, 800);
+    }
   };
 
   return (
@@ -83,11 +72,6 @@ export default function Login() {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        <div className="mt-6 text-xs text-gray-500">
-          <div>Van Rep: alex@vansales.com / password123</div>
-          <div>Distributor: rayyidh@bestjuice.com / password123</div>
-          <div>Manager: manager@manufacturer.com / password123</div>
-        </div>
       </div>
     </div>
   );
