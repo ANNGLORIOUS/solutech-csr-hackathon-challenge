@@ -139,6 +139,7 @@ class VanController extends Controller
         $distributorStock = DistributorStock::where('user_id', $validated['distributor_id'])
             ->where('product_id', $validated['product_id'])
             ->first();
+           // dd($distributorStock);
 
         if (!$distributorStock || $distributorStock->quantity < $validated['quantity']) {
             return response()->json([
