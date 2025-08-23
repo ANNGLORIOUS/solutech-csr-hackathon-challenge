@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import api from '../api/api.jsx';
 
-const USERS = [
-  {
-    email: 'alex@vansales.com',
-    password: 'password123',
-    role: 'van-rep',
-  },
-  {
-    email: 'rayyidh@bestjuice.com',
-    password: 'password123',
-    role: 'distributor',
-  },
-  {
-    email: 'manager@manufacturer.com',
-    password: 'password123',
-    role: 'manager',
-  },
-];
+// const USERS = [
+//   {
+//     email: 'alex@vansales.com',
+//     password: 'password123',
+//     role: 'van-rep',
+//   },
+//   {
+//     email: 'rayyidh@bestjuice.com',
+//     password: 'password123',
+//     role: 'distributor',
+//   },
+//   {
+//     email: 'manager@manufacturer.com',
+//     password: 'password123',
+//     role: 'manager',
+//   },
+// ];
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -32,9 +33,12 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const user = USERS.find(
-      (u) => u.email === email.trim() && u.password === password
-    );
+    const user = api
+      .post('/login', { email, password })
+      .then((response) => response.data)
+      .catch(() => null);
+
+    console.log(user);
     setTimeout(() => {
       setLoading(false);
       if (user) {
