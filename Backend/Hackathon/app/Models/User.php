@@ -83,43 +83,43 @@ public function stockMovementsTo()
 }
 
 // Helper methods for role-based queries
-public function scopeVanReps($query)
+public function scopeReps($query)
 {
-    return $query->where('role', 'van_rep');
+    return $query->where('role', 'Rep');
 }
 
 public function scopeDistributors($query)
 {
-    return $query->where('role', 'distributor');
+    return $query->where('role', 'Distributor');
 }
 
 public function scopeManufacturers($query)
 {
-    return $query->where('role', 'manufacturer');
+    return $query->where('role', 'Manufacturer');
 }
 
-// Check if user is a van rep
-public function isVanRep()
+// Check if user is a representative
+public function isRep()
 {
-    return $this->role === 'van_rep';
+    return $this->role === 'Rep';
 }
 
 // Check if user is a distributor
 public function isDistributor()
 {
-    return $this->role === 'distributor';
+    return $this->role === 'Distributor';
 }
 
 // Check if user is a manufacturer
 public function isManufacturer()
 {
-    return $this->role === 'manufacturer';
+    return $this->role === 'Manufacturer';
 }
 
 // Get current van capacity usage for van reps
 public function getCurrentVanCapacity()
 {
-    if (!$this->isVanRep()) {
+    if (!$this->isRep()) {
         return 0;
     }
     
@@ -129,7 +129,7 @@ public function getCurrentVanCapacity()
 // Check if van rep can add more stock
 public function canAddToVan($quantity)
 {
-    if (!$this->isVanRep()) {
+    if (!$this->isRep()) {
         return false;
     }
     
