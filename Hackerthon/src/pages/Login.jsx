@@ -1,7 +1,27 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import api from '../api/api.jsx'; 
+import api from '../api/api.jsx';
+
+
+// const USERS = [
+//   {
+//     email: 'alex@vansales.com',
+//     password: 'password123',
+//     role: 'van-rep',
+//   },
+//   {
+//     email: 'rayyidh@bestjuice.com',
+//     password: 'password123',
+//     role: 'distributor',
+//   },
+//   {
+//     email: 'manager@manufacturer.com',
+//     password: 'password123',
+//     role: 'manager',
+//   },
+// ];
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -15,24 +35,34 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    try {
-      const response = await api.post('/login', { email, password });
-      // Assuming backend returns { user: { ... }, token: '...' }
-      const { user, token } = response.data;
-      login({ ...user, token }); // Save user and token in context
-      // Redirect based on user role
-      if (user.role === 'van-rep') navigate('/van-rep');
-      else if (user.role === 'distributor') navigate('/distributor');
-      else if (user.role === 'manager') navigate('/manager');
-      else navigate('/');
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        'Login failed. Please check your credentials and try again.'
-      );
-    } finally {
+
+    const data = await api
+      .post('/login', { email, password })
+      .then((response) => response.data)
+      .catch(() => null);
+
+      //store token in localstorage
+      localStorage.setItem('token', data.token);
+
+    console.log(data);
+    
+    setTimeout(() => {
       setLoading(false);
-    }
+      if (data.user) {
+        login(data.user); // set user in context
+        if(data.user.role=='Rep'){
+ navigate(`/van-rep`);
+        }
+       else if(data.user.role=='Distributor'){
+          navigate(`/distributor`);
+        }
+       else if(data.user.role=='Manager'){
+          navigate(`/manager`);
+        }
+      } else {
+        setError('Invalid credentials. Please try again.');
+      }
+    }, 800);
   };
 
   return (
@@ -72,6 +102,11 @@ export default function Login() {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+        <div className="mt-6 text-xs text-gray-500">
+          <div>Van Rep: alex@vansales.com / password123</div>
+          <div>Distributor: rayyidh@bestjuice.com / password123</div>
+          <div>Manager: manager@manufacturer.com / password123</div>
+        </div>
       </div>
     </div>
   );

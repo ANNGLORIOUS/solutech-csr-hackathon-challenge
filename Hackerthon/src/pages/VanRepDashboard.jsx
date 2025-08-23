@@ -9,6 +9,11 @@ const initialVanStock = [
   { id: 3, product: 'Delmonte Orange Juice', quantity: 5 },
 ];
 
+    //const data = await api
+      //.get('/van/products')
+       //.then((response) => response.data)
+       //.catch(() => null);
+
 // Sample requests
 const initialRequests = [
   {
