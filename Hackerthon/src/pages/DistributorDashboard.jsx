@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Navbar from '../components/Navbar.jsx';
-import StockCard from '../components/StockCard.jsx';
+import Navbar from '../Components/Navbar.jsx';
+import StockCard from '../Components/StockCard.jsx';
 
 // Sample warehouse stock
 const initialStock = [
