@@ -1,42 +1,41 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\VanController;
+use App\Http\Controllers\DistributorController;
+use App\Http\Controllers\ManagerController;
 
-/*Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');*/
-
+// Public
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Protected routes (require authentication)
+// Protected routes
 Route::middleware('auth:sanctum')->group(function () {
-    
-    // Authentication
+
     Route::post('/logout', [AuthController::class, 'logout']);
-    
-    // Van Sales Rep Routes
-    Route::prefix('van')->group(function () {
-        
-        // Get van stock for authenticated van rep
-        Route::get('/stock', [VanController::class, 'getVanStock']);
-        
-        // Get all products available for requisition
-        Route::get('/products', [VanController::class, 'getProducts']);
-        
-        // Create new requisition request
-        Route::post('/requisitions', [VanController::class, 'createRequisition']);
-        
-        // Get requisitions for authenticated van rep
-        Route::get('/requisitions', [VanController::class, 'getMyRequisitions']);
-        
-        // Get available distributors
-        Route::get('/distributors', [VanController::class, 'getDistributors']);
-        
-            // Get van capacity information
-            Route::get('/capacity', [VanController::class, 'getCapacityInfo']);
-        });
+
+    // Van Rep Routes
+    Route::prefix('van-rep')->group(function () {
+        Route::get('/stock', [VanController::class, 'getVanStock']);       // van stock
+        Route::get('/products', [VanController::class, 'getProducts']);    // all products
+        Route::post('/requisitions', [VanController::class, 'createRequisition']); 
+        Route::get('/requisitions', [VanController::class, 'getMyRequisitions']); 
+        Route::get('/capacity', [VanController::class, 'getCapacityInfo']); 
     });
+
+    // Distributor Routes
+    Route::prefix('distributor')->group(function () {
+        Route::get('/stock', [DistributorController::class, 'getStock']);
+        Route::get('/pending-requisitions', [DistributorController::class, 'getPendingRequisitions']);
+        Route::put('/requisitions/{id}/approve', [DistributorController::class, 'approveRequisition']);
+        Route::put('/requisitions/{id}/reject', [DistributorController::class, 'rejectRequisition']);
+    });
+
+    // Manager Routes
+    Route::prefix('manager')->group(function () {
+        Route::get('/dashboard/stock-overview', [ManagerController::class, 'stockOverview']);
+        Route::get('/dashboard/pending-requisitions', [ManagerController::class, 'pendingRequisitions']);
+        Route::get('/stock-movements', [ManagerController::class, 'stockMovements']);
+    });
+});
