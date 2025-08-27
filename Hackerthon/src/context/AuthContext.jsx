@@ -1,18 +1,25 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // { email, role }
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) setUser(JSON.parse(storedUser));
+  }, []);
 
   const login = (userData) => {
     setUser(userData);
-    // Optionally store in localStorage/sessionStorage
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', userData.token);
   };
 
   const logout = () => {
     setUser(null);
-    // Optionally clear from localStorage/sessionStorage
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (
